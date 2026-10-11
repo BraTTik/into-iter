@@ -4,6 +4,21 @@ export type RangeOptions = {
   step: number;
 };
 
+const rangeOptionKeys: Set<keyof RangeOptions> = new Set(["start", "end", "step"]);
+
+export function isRangeOptions(value: unknown): value is RangeOptions {
+  if (typeof value === "object" && value !== null) {
+    const entries = Object.keys(value);
+    return (
+      entries.length >= 3 &&
+      rangeOptionKeys
+        .values()
+        .every((key) => Object.hasOwn(value, key) && typeof (value as RangeOptions)[key] === "number")
+    );
+  }
+  return false;
+}
+
 const createRangeOptions = (end: number): RangeOptions => ({ start: 0, end, step: 1 });
 
 export function rangeIterator(end: number): IteratorObject<number>;

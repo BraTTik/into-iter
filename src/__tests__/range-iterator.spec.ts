@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import { rangeIterator } from "../range-iterator";
+import { rangeIterator, isRangeOptions } from "../range-iterator";
 
 const collect = (iter: Iterable<number>): number[] => [...iter];
 
@@ -58,5 +58,49 @@ describe("rangeIterator", () => {
         ),
       ).toEqual([]);
     });
+  });
+});
+
+describe("isRangeOptions", () => {
+  it("checks type", () => {
+    expect(
+      isRangeOptions({
+        start: 1,
+        end: 1,
+        step: 1,
+      }),
+    ).toBe(true);
+    expect(isRangeOptions(null)).toBe(false);
+  });
+
+  it("checks empty object", () => {
+    expect(isRangeOptions({})).toBe(false);
+  });
+
+  it("checks random object", () => {
+    expect(isRangeOptions({ foo: 2, boo: 4, step: 1 })).toBe(false);
+  });
+
+  it("checks partial options", () => {
+    expect(isRangeOptions({ step: 1 })).toBe(false);
+    expect(isRangeOptions({ start: 1, end: 4 })).toBe(false);
+    expect(isRangeOptions({ end: 4, step: 2 })).toBe(false);
+  });
+
+  it("passes object with spare fields", () => {
+    expect(
+      isRangeOptions({
+        start: 1,
+        end: 1,
+        step: 1,
+        foo: "foo",
+        bar: "bar",
+      }),
+    ).toBe(true);
+  });
+
+  it("checks array", () => {
+    expect(isRangeOptions([1, 2, 4])).toBe(false);
+    expect(isRangeOptions([])).toBe(false);
   });
 });
