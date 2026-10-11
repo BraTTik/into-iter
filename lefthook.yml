@@ -16,3 +16,6 @@ pre-push:
     type-check:
       glob: '**/*.{ts,tsx}'
       run: yarn types
+    lint:
+      glob: '**/*.{js,ts,jsx,tsx}'
+      run: yarn lint
