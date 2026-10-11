@@ -6,9 +6,12 @@
     "moduleResolution": "NodeNext",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
-    "paths": {"*": ["./src/*"]},
-    "outDir": "dist/"
+    "paths": {"@/*": ["./src/*"]},
+    "rootDir": "./src",
+    "outDir": "dist/",
+    "lib": ["ESNext", "ES2025.Iterator"]
   },
   "include": ["./src"]
 }

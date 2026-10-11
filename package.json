@@ -3,26 +3,24 @@
   "packageManager": "yarn@4.18.1",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@typescript/native": "npm:typescript@^7.0.2",
-    "@yarnpkg/sdks": "^3.3.1",
+    "@types/jest": "^30.0.0",
     "eslint": "^10.12.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.13.0",
+    "jest": "^30.5.2",
+    "jest-util": "^30.5.1",
     "lefthook": "^2.2.1",
     "prettier": "^3.9.10",
+    "ts-jest": "^29.4.14",
     "tsx": "^4.23.15",
-    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript": "^6.0.2",
     "typescript-eslint": "^8.71.1"
   },
   "scripts": {
     "dev": "npx tsx --watch src/index.ts",
     "lint": "eslint src",
-    "types": "tsc --noEmit"
-  },
-  "dependenciesMeta": {
-    "eslint@10.12.0": {
-      "unplugged": true
-    }
+    "types": "tsc --noEmit",
+    "test": "jest"
   },
   "resolutions": {
     "@yarnpkg/core": "4.9.1"
