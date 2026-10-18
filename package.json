@@ -1,5 +1,39 @@
 {
   "name": "into-iter",
+  "version": "0.1.0",
+  "description": "Lazy chainable adapters for iterables",
+  "license": "MIT",
+  "author": "brattik",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BraTTik/into-iter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BraTTik/into-iter/issues"
+  },
+  "homepage": "https://github.com/BraTTik/into-iter#readme",
+  "type": "module",
+  "sideEffects": [
+    "./dist/filter.js"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./filter": {
+      "types": "./dist/filter.d.ts",
+      "import": "./dist/filter.js",
+      "default": "./dist/filter.js"
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  },
   "packageManager": "yarn@4.18.1",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -17,10 +51,12 @@
     "typescript-eslint": "^8.71.1"
   },
   "scripts": {
-    "dev": "npx tsx --watch src/index.ts",
+    "dev": "tsx --watch examples/playground.ts",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "prepublishOnly": "rm -rf dist && tsc -p tsconfig.build.json",
     "lint": "eslint src",
     "types": "tsc --noEmit",
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "resolutions": {
     "@yarnpkg/core": "4.9.1"

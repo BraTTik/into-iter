@@ -23,6 +23,7 @@ node_modules/
 # Сборка / покрытие
 dist/
 *.tsbuildinfo
+*.tgz
 
 # Секреты
 .env

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import { rangeIterator, isRangeOptions } from "../range-iterator";
+import { rangeIterator, isRangeOptions } from "../range-iterator.js";
 
 const collect = (iter: Iterable<number>): number[] => [...iter];
 

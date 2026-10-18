@@ -11,7 +11,8 @@
     "paths": {"@/*": ["./src/*"]},
     "rootDir": "./src",
     "outDir": "dist/",
-    "lib": ["ESNext", "ES2025.Iterator"]
+    "noEmit": true,
+    "lib": ["ESNext", "ES2025.Iterator", "dom"]
   },
   "include": ["./src"]
 }

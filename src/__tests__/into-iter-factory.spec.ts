@@ -1,6 +1,6 @@
 import { describe, it, expect } from "@jest/globals";
-import { intoIter } from "../into-iter-factory";
-import { IntoIter } from "../into-iter";
+import { intoIter } from "../into-iter-factory.js";
+import { IntoIter } from "../into-iter.js";
 
 describe("intoIterFactory", () => {
   describe("constructor", () => {

@@ -1,5 +1,5 @@
-import { RangeOptions, isRangeOptions } from "./range-iterator";
-import { IntoIter } from "./into-iter";
+import { RangeOptions, isRangeOptions } from "./range-iterator.js";
+import { IntoIter } from "./into-iter.js";
 
 export function intoIter(rangeOptions: RangeOptions): IntoIter<number>;
 export function intoIter(range: number): IntoIter<number>;
