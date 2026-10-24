@@ -1,4 +1,9 @@
-export type DoubleEndedCursor<T> = Iterator<T> & {
+export type Cursor<T> = Iterator<T> & {
+  nextBack?: () => IteratorResult<T>;
+  [Symbol.iterator](): Cursor<T>;
+};
+
+export type DoubleEndedCursor<T> = Cursor<T> & {
   nextBack: () => IteratorResult<T>;
   [Symbol.iterator](): DoubleEndedCursor<T>;
 };

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "@jest/globals";
 import "../filter.js";
+import "../map.js";
 import { intoIter } from "../into-iter-factory.js";
 
 const collect = <T>(iter: Iterable<T>): T[] => [...iter];
