@@ -1,5 +1,6 @@
 import { IntoIter } from "./into-iter.js";
-import type { Cursor } from "./double-ended-cursor.js";
+import { Cursor, createCursor } from "./double-ended-cursor.js";
+import { bound } from "./utils.js";
 
 declare module "./into-iter.js" {
   interface IntoIter<T> {
@@ -12,19 +13,13 @@ const mapCursor = <T, R>(inner: Cursor<T>, fn: (value: T) => R): Cursor<R> => {
     return item.done ? { done: true, value: undefined } : { done: false, value: fn(item.value) };
   };
 
-  const cursor: Cursor<R> = {
+  const nextBack = bound(inner, inner.nextBack);
+
+  return createCursor({
     next: () => apply(inner.next()),
-    [Symbol.iterator]() {
-      return this;
-    },
-  };
-
-  if (inner.nextBack) {
-    const nextBack = inner.nextBack.bind(inner);
-    cursor.nextBack = () => apply(nextBack());
-  }
-
-  return cursor;
+    nextBack: nextBack && (() => apply(nextBack())),
+    remaining: bound(inner, inner.remaining),
+  });
 };
 
 IntoIter.prototype.map = function map<T, R>(this: IntoIter<T>, fn: (value: T) => R): IntoIter<R> {

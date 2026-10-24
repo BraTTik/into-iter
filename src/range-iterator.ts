@@ -37,6 +37,7 @@ const rangedDoubleEndedCursor = (options: RangeOptions): DoubleEndedCursor<numbe
   return {
     next: withDone(() => ({ done: false, value: start + front++ * step })),
     nextBack: withDone(() => ({ done: false, value: start + --back * step })),
+    remaining: () => back - front,
     [Symbol.iterator]() {
       return this;
     },

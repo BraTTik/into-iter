@@ -1,5 +1,6 @@
 import { RangeOptions, rangeIterator } from "./range-iterator.js";
-import { arrayLikeDoubleEndedCursor, isArrayLike, Cursor } from "./double-ended-cursor.js";
+import { arrayLikeDoubleEndedCursor, createCursor, isArrayLike, Cursor } from "./double-ended-cursor.js";
+import { bound } from "./utils.js";
 
 export class IntoIter<T> {
   protected _reversed = false;
@@ -36,16 +37,15 @@ export class IntoIter<T> {
   [Symbol.iterator](): Cursor<T> {
     const cursor = this.open();
     if (!this._reversed) return cursor;
-    if (!cursor.nextBack) {
+    const nextBack = bound(cursor, cursor.nextBack);
+    if (!nextBack) {
       throw new Error("Cannot walk backwards");
     }
 
-    return {
-      [Symbol.iterator](): Cursor<T> {
-        return this;
-      },
-      next: () => cursor.nextBack!(),
+    return createCursor({
+      next: nextBack,
       nextBack: () => cursor.next(),
-    };
+      remaining: bound(cursor, cursor.remaining),
+    });
   }
 }
