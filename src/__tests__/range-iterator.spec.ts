@@ -1,7 +1,16 @@
 import { describe, it, expect } from "@jest/globals";
 import { rangeIterator, isRangeOptions } from "../range-iterator.js";
+import type { DoubleEndedCursor } from "../double-ended-cursor.js";
 
 const collect = (iter: Iterable<number>): number[] => [...iter];
+
+const collectBack = (cursor: DoubleEndedCursor<number>): number[] => {
+  const result: number[] = [];
+  for (let item = cursor.nextBack(); !item.done; item = cursor.nextBack()) {
+    result.push(item.value);
+  }
+  return result;
+};
 
 describe("rangeIterator", () => {
   describe("number overload", () => {
@@ -57,6 +66,91 @@ describe("rangeIterator", () => {
           }),
         ),
       ).toEqual([]);
+    });
+  });
+
+  describe("nextBack", () => {
+    it("yields values from the back with step 1", () => {
+      expect(collectBack(rangeIterator(5))).toEqual([4, 3, 2, 1, 0]);
+    });
+
+    it("starts from the last value reachable by step", () => {
+      expect(collectBack(rangeIterator({ start: 2, end: 9, step: 3 }))).toEqual([8, 5, 2]);
+    });
+
+    it("excludes end when it lands exactly on a step", () => {
+      expect(collectBack(rangeIterator({ start: 2, end: 8, step: 2 }))).toEqual([6, 4, 2]);
+    });
+
+    it("yields a single value", () => {
+      expect(collectBack(rangeIterator(1))).toEqual([0]);
+    });
+
+    it("yields nothing for an empty range", () => {
+      expect(rangeIterator(0).nextBack()).toEqual({ done: true, value: undefined });
+      expect(rangeIterator({ start: 10, end: 5, step: 1 }).nextBack()).toEqual({ done: true, value: undefined });
+    });
+
+    it("stays done after exhaustion", () => {
+      const cursor = rangeIterator(1);
+
+      cursor.nextBack();
+
+      expect(cursor.nextBack()).toEqual({ done: true, value: undefined });
+      expect(cursor.nextBack()).toEqual({ done: true, value: undefined });
+    });
+
+    it("returns the last value immediately for a large range", () => {
+      expect(rangeIterator(1_000_000).nextBack()).toEqual({ done: false, value: 999_999 });
+    });
+  });
+
+  describe("mixed next and nextBack", () => {
+    it("consumes from both ends without overlap", () => {
+      const cursor = rangeIterator(5);
+
+      expect(cursor.next().value).toBe(0);
+      expect(cursor.nextBack().value).toBe(4);
+      expect(cursor.next().value).toBe(1);
+      expect(cursor.nextBack().value).toBe(3);
+      expect(cursor.next().value).toBe(2);
+      expect(cursor.next().done).toBe(true);
+      expect(cursor.nextBack().done).toBe(true);
+    });
+
+    it("meets in the middle with a custom step", () => {
+      const cursor = rangeIterator({ start: 1, end: 10, step: 2 });
+
+      expect(cursor.nextBack().value).toBe(9);
+      expect(cursor.next().value).toBe(1);
+      expect(cursor.nextBack().value).toBe(7);
+      expect(cursor.next().value).toBe(3);
+      expect(cursor.next().value).toBe(5);
+      expect(cursor.nextBack().done).toBe(true);
+    });
+
+    it("iterates the remaining middle after taking from the back", () => {
+      const cursor = rangeIterator(5);
+
+      cursor.nextBack();
+      cursor.nextBack();
+
+      expect(collect(cursor)).toEqual([0, 1, 2]);
+    });
+  });
+
+  describe("iterable protocol", () => {
+    it("returns itself from Symbol.iterator", () => {
+      const cursor = rangeIterator(3);
+
+      expect(cursor[Symbol.iterator]()).toBe(cursor);
+    });
+
+    it("is single-pass", () => {
+      const cursor = rangeIterator(3);
+
+      expect(collect(cursor)).toEqual([0, 1, 2]);
+      expect(collect(cursor)).toEqual([]);
     });
   });
 });

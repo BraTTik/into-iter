@@ -1,3 +1,5 @@
+import type { DoubleEndedCursor } from "./double-ended-cursor.ts";
+
 export type RangeOptions = {
   start: number;
   end: number;
@@ -21,9 +23,29 @@ export function isRangeOptions(value: unknown): value is RangeOptions {
 
 const createRangeOptions = (end: number): RangeOptions => ({ start: 0, end, step: 1 });
 
-export function rangeIterator(end: number): IteratorObject<number>;
-export function rangeIterator(options: RangeOptions): IteratorObject<number>;
-export function rangeIterator(rangeOrOptions: number | RangeOptions): IteratorObject<number> {
+const rangedDoubleEndedCursor = (options: RangeOptions): DoubleEndedCursor<number> => {
+  const { start, end, step } = options;
+  const count = start < end ? Math.floor((end - 1 - start) / step) + 1 : 0;
+  let front = 0;
+  let back = count;
+
+  const withDone = (callback: () => IteratorResult<number>) => (): IteratorResult<number> => {
+    if (front >= back) return { done: true, value: undefined };
+    return callback();
+  };
+
+  return {
+    next: withDone(() => ({ done: false, value: start + front++ * step })),
+    nextBack: withDone(() => ({ done: false, value: start + --back * step })),
+    [Symbol.iterator]() {
+      return this;
+    },
+  };
+};
+
+export function rangeIterator(end: number): DoubleEndedCursor<number>;
+export function rangeIterator(options: RangeOptions): DoubleEndedCursor<number>;
+export function rangeIterator(rangeOrOptions: number | RangeOptions): DoubleEndedCursor<number> {
   let options: RangeOptions;
   if (typeof rangeOrOptions === "number") {
     if (isNaN(rangeOrOptions)) {
@@ -34,17 +56,5 @@ export function rangeIterator(rangeOrOptions: number | RangeOptions): IteratorOb
     options = rangeOrOptions;
   }
 
-  let current = options.start;
-
-  return Iterator.from({
-    next: () => {
-      if (current < options.end) {
-        const value = current;
-        current += options.step;
-        return { done: false, value };
-      }
-
-      return { done: true, value: undefined };
-    },
-  }) as IteratorObject<number>;
+  return rangedDoubleEndedCursor(options);
 }
