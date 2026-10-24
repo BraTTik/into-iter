@@ -14,7 +14,9 @@
   "homepage": "https://github.com/BraTTik/into-iter#readme",
   "type": "module",
   "sideEffects": [
-    "./dist/filter.js"
+    "./dist/map.js",
+    "./dist/filter.js",
+    "./dist/limit.js"
   ],
   "files": [
     "dist"
@@ -25,10 +27,20 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./map": {
+      "types": "./dist/map.d.ts",
+      "import": "./dist/map.js",
+      "default": "./dist/map.js"
+    },
     "./filter": {
       "types": "./dist/filter.d.ts",
       "import": "./dist/filter.js",
       "default": "./dist/filter.js"
+    },
+    "./limit": {
+      "types": "./dist/limit.d.ts",
+      "import": "./dist/limit.js",
+      "default": "./dist/limit.js"
     }
   },
   "engines": {
