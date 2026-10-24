@@ -1,6 +1,6 @@
 import { IntoIter } from "./into-iter.js";
 import { createCursor, Cursor } from "./double-ended-cursor.js";
-import { bound } from "./utils.js";
+import { bound, isNotRangeNumber } from "./utils.js";
 
 declare module "./into-iter.js" {
   interface IntoIter<T> {
@@ -36,7 +36,7 @@ function limitCursor<T>(inner: Cursor<T>, count: number): Cursor<T> {
 }
 
 IntoIter.prototype.limit = function limit<T>(this: IntoIter<T>, count: number): IntoIter<T> {
-  if (isNaN(count) || count < 0 || !Number.isInteger(count)) {
+  if (isNotRangeNumber(count)) {
     throw new TypeError("Limit must be a positive integer");
   }
   return IntoIter.fromCursor(() => limitCursor(this[Symbol.iterator](), count));
