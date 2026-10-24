@@ -1,9 +1,15 @@
 import { RangeOptions, rangeIterator } from "./range-iterator.js";
+import { arrayLikeDoubleEndedCursor, isArrayLike } from "./double-ended-cursor.js";
 
 export class IntoIter<T> {
   protected iterable: Iterable<T>;
 
   static fromIterable<T>(iterable: Iterable<T>): IntoIter<T> {
+    if (isArrayLike(iterable)) {
+      return new IntoIter<T>({
+        [Symbol.iterator]: () => arrayLikeDoubleEndedCursor<T>(iterable as ArrayLike<T>),
+      });
+    }
     return new IntoIter(iterable);
   }
 
