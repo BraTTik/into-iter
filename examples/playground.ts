@@ -15,9 +15,7 @@ const nextIter = test.map(add2).limit(2).reversed;
 
 const flatMapIter = intoIter([1, 2, 3, 4]).limit(2);
 
-const flat = intoIter([[1], [2, 3, 4]])
-  .flatten()
-  .limit(2).reversed;
+const flat = intoIter([1, 2, 3, 4]).filterMap((val) => (val % 2 === 0 ? (val * 2).toString(2) : undefined));
 
 console.log(...flat);
 

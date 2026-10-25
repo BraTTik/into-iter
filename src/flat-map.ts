@@ -6,6 +6,7 @@ declare module "./into-iter.js" {
   interface IntoIter<T> {
     flatMap<R>(map: (value: T) => Iterable<R>): IntoIter<R>;
     flatten<R>(this: IntoIter<Iterable<R>>): IntoIter<R>;
+    filterMap<R>(this: IntoIter<T>, fn: (value: T) => R | undefined): IntoIter<R>;
   }
 }
 
@@ -88,4 +89,11 @@ IntoIter.prototype.flatMap = function flatMap<T, R>(this: IntoIter<T>, fn: (valu
 
 IntoIter.prototype.flatten = function flatten<T>(this: IntoIter<Iterable<T>>): IntoIter<T> {
   return this.flatMap((val) => val);
+};
+
+IntoIter.prototype.filterMap = function filterMap<T, R>(this: IntoIter<T>, fn: (value: T) => R | undefined) {
+  return this.flatMap((value) => {
+    const mapped = fn(value);
+    return mapped == null ? [] : [mapped];
+  });
 };
