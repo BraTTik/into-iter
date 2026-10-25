@@ -17,6 +17,7 @@ npm install into-iter
 ```ts
 import { intoIter } from "into-iter";
 import "into-iter/map";
+import "into-iter/enumerate";
 import "into-iter/filter";
 import "into-iter/limit";
 import "into-iter/skip";
@@ -58,6 +59,24 @@ console.log([...values]); // [6, 8]
 ```ts
 [...intoIter([1, 2, 3]).map((n) => n * 10)]; // [10, 20, 30]
 ```
+
+### `enumerate()`
+
+Нумерует элементы с нуля. Каждая пара — это индекс и значение. Индекс относится к тому итератору, на котором вызван `enumerate`: после `filter` или `skip` счёт начинается заново. Подключается отдельным импортом `into-iter/enumerate`.
+
+```ts
+[...intoIter(["a", "b", "c"]).enumerate()]; // [[0, "a"], [1, "b"], [2, "c"]]
+[...intoIter([1, 2, 3, 4]).filter((n) => n % 2 === 0).enumerate()]; // [[0, 2], [1, 4]]
+```
+
+`enumerate` всегда считает с нуля в том порядке, в котором читается его источник. Сначала развернуть, потом нумеровать — индексы начинаются с нуля. Сначала нумеровать, потом развернуть — разворачиваются уже готовые пары, и индексы остаются прежними:
+
+```ts
+[...intoIter([1, 2, 3, 4]).reversed.enumerate()]; // [[0, 4], [1, 3], [2, 2], [3, 1]]
+[...intoIter([1, 2, 3, 4]).enumerate().reversed]; // [[3, 4], [2, 3], [1, 2], [0, 1]]
+```
+
+Повторное чтение начинает нумерацию с нуля. Для `enumerate().reversed` нужна длина. После `filter` её нет, поэтому такая цепочка выбрасывает `Cannot walk backwards`.
 
 ### `filter(predicate)`
 
@@ -194,7 +213,7 @@ const iter = intoIter(new Set([1, 2, 3])).reversed; // ошибки нет
 [...intoIter(10).reversed.limit(3)]; // [9, 8, 7] — последние 3
 ```
 
-`reversed.limit(n)` работает с любой цепочкой, которая читается с конца. Для `limit(n).reversed` нужно ещё знать длину, чтобы найти `n`-й элемент. Длину знают массивы, строки, typed array и диапазоны, а `map`, `limit`, `skip` и `reversed` её сохраняют. После `filter`, `flatMap`, `flatten` и `filterMap` длина неизвестна, поэтому такая цепочка выбрасывает `Cannot walk backwards`:
+`reversed.limit(n)` работает с любой цепочкой, которая читается с конца. Для `limit(n).reversed` нужно ещё знать длину, чтобы найти `n`-й элемент. Длину знают массивы, строки, typed array и диапазоны, а `map`, `enumerate`, `limit`, `skip` и `reversed` её сохраняют. После `filter`, `flatMap`, `flatten` и `filterMap` длина неизвестна, поэтому такая цепочка выбрасывает `Cannot walk backwards`:
 
 ```ts
 [...intoIter(20).filter((n) => n % 7 === 0).reversed.limit(2)]; // [14, 7]

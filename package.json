@@ -15,6 +15,7 @@
   "type": "module",
   "sideEffects": [
     "./dist/map.js",
+    "./dist/enumerate.js",
     "./dist/filter.js",
     "./dist/limit.js",
     "./dist/skip.js",
@@ -33,6 +34,11 @@
       "types": "./dist/map.d.ts",
       "import": "./dist/map.js",
       "default": "./dist/map.js"
+    },
+    "./enumerate": {
+      "types": "./dist/enumerate.d.ts",
+      "import": "./dist/enumerate.js",
+      "default": "./dist/enumerate.js"
     },
     "./filter": {
       "types": "./dist/filter.d.ts",
