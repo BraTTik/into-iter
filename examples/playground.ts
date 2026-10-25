@@ -5,6 +5,7 @@ import "../src/limit.js";
 import "../src/flat-map.js";
 import "../src/collect.js";
 import "../src/enumerate.js";
+import "../src/count.js";
 
 function add2(num: number): number {
   return num + 2;
@@ -19,7 +20,7 @@ const flatMapIter = intoIter([1, 2, 3, 4]).limit(2);
 
 const flat = intoIter([1, 2, 3, 4]).filterMap((val) => (val % 2 === 0 ? (val * 2).toString(2) : undefined));
 
-console.log(...flat);
+console.log(addIter.count());
 
 console.log(flatMapIter.enumerate().toMap());
 
