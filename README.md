@@ -23,6 +23,7 @@ import "into-iter/limit";
 import "into-iter/skip";
 import "into-iter/flat-map";
 import "into-iter/collect";
+import "into-iter/math";
 
 const values = intoIter([1, 2, 3, 4])
   .map((n) => n * 2)
@@ -292,3 +293,32 @@ intoIter([1, 2, 2, 3]).toArray(); // [1, 2, 2, 3]
 intoIter([1, 2, 2, 3]).toSet(); // Set { 1, 2, 3 }
 intoIter([["a", 1], ["b", 2]] as [string, number][]).toMap(); // Map { "a" => 1, "b" => 2 }
 ```
+
+## Числовые агрегаты
+
+`sum`, `product`, `avg`, `min` и `max` читают цепочку сразу. До их вызова она остаётся ленивой. Подключаются импортом `into-iter/math`. Методы есть у последовательности чисел и у последовательности `bigint`. Смешивать эти типы в одной последовательности нельзя.
+
+```ts
+const numbers = intoIter([1, 2, 3, 4]);
+
+numbers.sum(); // 10
+numbers.product(); // 24
+numbers.avg(); // 2.5
+numbers.min(); // 1
+numbers.max(); // 4
+```
+
+Пустая числовая последовательность: `sum` возвращает `0`, `product` — `1`, `avg` — `NaN`, `min` и `max` — `undefined`.
+
+`bigint` считается отдельно. `avg` делит нацело, к нулю:
+
+```ts
+intoIter([1n, 2n, 3n]).sum(); // 6n
+intoIter([1n, 2n, 3n]).product(); // 6n
+intoIter([1n, 2n, 3n]).avg(); // 2n
+intoIter([1n, 2n]).avg(); // 1n
+intoIter([3n, 1n, 2n]).min(); // 1n
+intoIter([3n, 1n, 2n]).max(); // 3n
+```
+
+Пустой `bigint`-итератор в рантайме не отличить от пустого числового, поэтому `sum` и `product` на нём возвращают `0` и `1`, а `avg` — `NaN`. `min` и `max` и здесь возвращают `undefined`.

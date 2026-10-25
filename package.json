@@ -20,7 +20,8 @@
     "./dist/limit.js",
     "./dist/skip.js",
     "./dist/flat-map.js",
-    "./dist/collect.js"
+    "./dist/collect.js",
+    "./dist/math.js"
   ],
   "files": [
     "dist"
@@ -65,6 +66,11 @@
       "types": "./dist/collect.d.ts",
       "import": "./dist/collect.js",
       "default": "./dist/collect.js"
+    },
+    "./math": {
+      "types": "./dist/math.d.ts",
+      "import": "./dist/math.js",
+      "default": "./dist/math.js"
     }
   },
   "engines": {
