@@ -296,14 +296,14 @@ describe("IntoIter flatMap", () => {
       ).toEqual([1, 2]);
     });
 
-    it("reverses the limited window", () => {
-      expect(
+    it("throws when the limited window is reversed because the length is unknown", () => {
+      expect(() =>
         collect(
           intoIter([[1], [2, 3, 4]])
             .flatMap((row) => row)
             .limit(2).reversed,
         ),
-      ).toEqual([2, 1]);
+      ).toThrow("Cannot walk backwards");
     });
   });
 

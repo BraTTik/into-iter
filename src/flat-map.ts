@@ -5,6 +5,7 @@ import { bound } from "./utils.js";
 declare module "./into-iter.js" {
   interface IntoIter<T> {
     flatMap<R>(map: (value: T) => Iterable<R>): IntoIter<R>;
+    flatten<R>(this: IntoIter<Iterable<R>>): IntoIter<R>;
   }
 }
 
@@ -13,43 +14,39 @@ const flatMapCursor = <T, R>(inner: Cursor<T>, fn: (value: T) => Iterable<R>): C
     return IntoIter.fromIterable(fn(item));
   };
 
-  let forwardIter: Iterator<R> | undefined;
-  let backwardIter: Iterator<R> | undefined;
+  let forwardIter: Cursor<R> | undefined;
+  let backwardIter: Cursor<R> | undefined;
 
-  let remain = 0;
-
-  const remaining = bound(inner, inner.remaining);
   const nextBack = bound(inner, inner.nextBack);
   const next = bound(inner, inner.next);
 
-  const getRemain = () => {
-    console.log(remain);
-    return remain;
-  };
-
   const witCurrentIter =
     (opt: {
-      current: () => Iterator<R> | undefined;
+      current: () => Cursor<R> | undefined;
+      backward: () => Cursor<R> | undefined;
       resetCurrent: () => void;
       openCurrent: (value: T) => void;
       outerNext: () => IteratorResult<T>;
     }) =>
     (): IteratorResult<R> => {
-      const { current, openCurrent, resetCurrent, outerNext } = opt;
+      const { current, openCurrent, resetCurrent, outerNext, backward } = opt;
       while (true) {
         const currentIterator = current();
         if (currentIterator) {
           const res = currentIterator.next();
 
           if (!res.done) {
-            remain++;
             return res;
           }
           resetCurrent();
         }
 
         const outer = outerNext();
-        if (outer.done) return { done: true, value: undefined };
+        if (outer.done) {
+          const back = backward()?.nextBack?.();
+          if (back && !back?.done) return { done: false, value: back.value };
+          return { done: true, value: undefined };
+        }
         openCurrent(outer.value);
       }
     };
@@ -57,6 +54,7 @@ const flatMapCursor = <T, R>(inner: Cursor<T>, fn: (value: T) => Iterable<R>): C
   return createCursor({
     next: witCurrentIter({
       current: () => forwardIter,
+      backward: () => backwardIter,
       outerNext: next!,
       openCurrent: (value: T) => {
         forwardIter = open(value)[Symbol.iterator]();
@@ -71,6 +69,7 @@ const flatMapCursor = <T, R>(inner: Cursor<T>, fn: (value: T) => Iterable<R>): C
         current: () => {
           return backwardIter;
         },
+        backward: () => forwardIter,
         outerNext: nextBack,
         openCurrent: (value: T) => {
           backwardIter = open(value).reversed[Symbol.iterator]();
@@ -79,10 +78,14 @@ const flatMapCursor = <T, R>(inner: Cursor<T>, fn: (value: T) => Iterable<R>): C
           backwardIter = undefined;
         },
       }),
-    remaining: remaining && (() => Math.max(remaining(), getRemain())),
+    remaining: undefined,
   });
 };
 
 IntoIter.prototype.flatMap = function flatMap<T, R>(this: IntoIter<T>, fn: (value: T) => Iterable<R>) {
   return IntoIter.fromCursor(() => flatMapCursor(this[Symbol.iterator](), fn));
+};
+
+IntoIter.prototype.flatten = function flatten<T>(this: IntoIter<Iterable<T>>): IntoIter<T> {
+  return this.flatMap((val) => val);
 };

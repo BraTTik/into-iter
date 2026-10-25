@@ -15,6 +15,12 @@ const nextIter = test.map(add2).limit(2).reversed;
 
 const flatMapIter = intoIter([1, 2, 3, 4]).limit(2);
 
+const flat = intoIter([[1], [2, 3, 4]])
+  .flatten()
+  .limit(2).reversed;
+
+console.log(...flat);
+
 console.log([...flatMapIter]);
 console.log([...flatMapIter.reversed]);
 
