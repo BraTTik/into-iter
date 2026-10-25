@@ -132,7 +132,26 @@ console.log([...values]); // [6, 8]
 [...intoIter([[[1, 2]], [[3]]]).flatten().flatten()]; // [1, 2, 3]
 ```
 
-Строка, `Set` и `Map` тоже последовательности: `"ab"` развернётся в `"a"`, `"b"`. `flatten` подключается тем же импортом, что и `flatMap`: `into-iter/flat-map`.
+Строка, `Set` и `Map` тоже последовательности: `"ab"` развернётся в `"a"`, `"b"`. `flatten` и `filterMap` подключаются тем же импортом, что и `flatMap`: `into-iter/flat-map`.
+
+### `filterMap(fn)`
+
+За один проход преобразует элемент и решает, оставлять ли его. `fn` возвращает новое значение или `undefined`, чтобы пропустить исходный элемент. `null` тоже пропускается. Ноль, `false` и пустая строка остаются:
+
+```ts
+[...intoIter(["1", "x", "2"]).filterMap((s) => {
+  const n = Number(s);
+  return Number.isNaN(n) ? undefined : n;
+})]; // [1, 2]
+
+[...intoIter([0, false, "", 1]).filterMap((value) => value)]; // [0, false, "", 1]
+```
+
+Возвращённый массив приходит как один элемент и дальше не разворачивается. Длины у результата нет, поэтому `filterMap(...).limit(n).reversed` выбрасывает `Cannot walk backwards`. `filterMap(...).reversed` читает оставленные значения с конца:
+
+```ts
+[...intoIter([1, 2, 3, 4, 5]).filterMap((n) => (n % 2 === 0 ? n * 10 : undefined)).reversed]; // [40, 20]
+```
 
 ### `reversed`
 
@@ -175,7 +194,7 @@ const iter = intoIter(new Set([1, 2, 3])).reversed; // ошибки нет
 [...intoIter(10).reversed.limit(3)]; // [9, 8, 7] — последние 3
 ```
 
-`reversed.limit(n)` работает с любой цепочкой, которая читается с конца. Для `limit(n).reversed` нужно ещё знать длину, чтобы найти `n`-й элемент. Длину знают массивы, строки, typed array и диапазоны, а `map`, `limit`, `skip` и `reversed` её сохраняют. После `filter`, `flatMap` и `flatten` длина неизвестна, поэтому такая цепочка выбрасывает `Cannot walk backwards`:
+`reversed.limit(n)` работает с любой цепочкой, которая читается с конца. Для `limit(n).reversed` нужно ещё знать длину, чтобы найти `n`-й элемент. Длину знают массивы, строки, typed array и диапазоны, а `map`, `limit`, `skip` и `reversed` её сохраняют. После `filter`, `flatMap`, `flatten` и `filterMap` длина неизвестна, поэтому такая цепочка выбрасывает `Cannot walk backwards`:
 
 ```ts
 [...intoIter(20).filter((n) => n % 7 === 0).reversed.limit(2)]; // [14, 7]
