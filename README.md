@@ -32,6 +32,7 @@ import "into-iter/nth";
 import "into-iter/take-while";
 import "into-iter/skip-while";
 import "into-iter/map-while";
+import "into-iter/chain";
 
 const values = intoIter([1, 2, 3, 4])
   .map((n) => n * 2)
@@ -160,6 +161,22 @@ console.log([...values]); // [6, 8]
 ```
 
 `mapWhile(...).reversed` выбрасывает `Cannot walk backwards`.
+
+### `chain(iterable)`
+
+Лениво склеивает текущую последовательность со второй того же типа элементов. Вперёд сначала читается первая, и только когда она закончилась — вторая. С конца можно идти, если обе стороны двусторонние: сначала вторая с конца, потом первая с конца. `remaining` есть, только когда длину знают обе стороны, и равен их сумме. `Set` или генератор на любой стороне убирает чтение с конца и `remaining`. Подключается импортом `into-iter/chain`.
+
+```ts
+[...intoIter([1, 2]).chain([3, 4])]; // [1, 2, 3, 4]
+[...intoIter([1, 2]).chain([3, 4]).reversed]; // [4, 3, 2, 1]
+[...intoIter([1, 2]).chain([3, 4]).chain([5])]; // [1, 2, 3, 4, 5]
+[...intoIter([1, 2]).chain([3, 4]).chain([5]).reversed]; // [5, 4, 3, 2, 1]
+
+const cursor = intoIter([1, 2]).chain([3, 4, 5])[Symbol.iterator]();
+cursor.remaining?.(); // 5
+```
+
+`intoIter([1, 2]).chain(new Set([3, 4])).reversed` выбрасывает `Cannot walk backwards`.
 
 ### `flatMap(fn)`
 

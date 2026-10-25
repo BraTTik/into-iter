@@ -29,7 +29,8 @@
     "./dist/nth.js",
     "./dist/take-while.js",
     "./dist/skip-while.js",
-    "./dist/map-while.js"
+    "./dist/map-while.js",
+    "./dist/chain.js"
   ],
   "files": [
     "dist"
@@ -119,6 +120,11 @@
       "types": "./dist/map-while.d.ts",
       "import": "./dist/map-while.js",
       "default": "./dist/map-while.js"
+    },
+    "./chain": {
+      "types": "./dist/chain.d.ts",
+      "import": "./dist/chain.js",
+      "default": "./dist/chain.js"
     }
   },
   "engines": {
