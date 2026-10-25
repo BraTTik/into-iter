@@ -19,6 +19,8 @@ import { intoIter } from "into-iter";
 import "into-iter/map";
 import "into-iter/filter";
 import "into-iter/limit";
+import "into-iter/skip";
+import "into-iter/flat-map";
 
 const values = intoIter([1, 2, 3, 4])
   .map((n) => n * 2)
@@ -77,6 +79,61 @@ console.log([...values]); // [6, 8]
 
 `count` должен быть неотрицательным целым числом, иначе `limit` выбрасывает `TypeError`.
 
+### `skip(count)`
+
+Пропускает первые `count` элементов. Дальше источник читается как обычно, в том числе бесконечный генератор, если после `skip` стоит `limit`:
+
+```ts
+[...intoIter(10).skip(3)]; // [3, 4, 5, 6, 7, 8, 9]
+[...intoIter([1, 2, 3]).skip(0)]; // [1, 2, 3]
+[...intoIter([1, 2, 3]).skip(10)]; // []
+```
+
+`count` должен быть неотрицательным целым числом, иначе `skip` выбрасывает `TypeError`. Ноль элементов пропускать можно.
+
+Несколько `skip` подряд складываются: `skip(2).skip(3)` пропускает пять элементов.
+
+### `flatMap(fn)`
+
+Вызывает `fn` для каждого элемента и склеивает последовательности, которые она вернула. `fn` должна вернуть `Iterable`: массив, строку, `Set`, `Map`, генератор или другой `IntoIter`. Одно значение передаётся массивом из одного элемента, `[value]`. Число, объект и `null` вызывают `TypeError` при чтении.
+
+```ts
+[...intoIter([1, 2, 3]).flatMap((n) => [n, n * 10])]; // [1, 10, 2, 20, 3, 30]
+[...intoIter(["foo bar", "baz"]).flatMap((line) => line.split(" "))]; // ["foo", "bar", "baz"]
+```
+
+Пустая последовательность выпадает из результата. Строка разбирается на символы, `Set` отдаёт значения, `Map` отдаёт пары `[key, value]`:
+
+```ts
+[...intoIter([1, 2, 3]).flatMap((n) => (n === 2 ? [n] : []))]; // [2]
+[...intoIter([1]).flatMap(() => "ab")]; // ["a", "b"]
+[...intoIter(["a", "b"]).flatMap((key) => new Map([[key, key.length]]))]; // [["a", 1], ["b", 1]]
+```
+
+`fn` вызывается, только когда нужна следующая последовательность. Длины у результата нет: сколько элементов вернёт `fn`, заранее неизвестно.
+
+### `flatten()`
+
+Склеивает один уровень вложенности. Это `flatMap`, который подставляет сам элемент как последовательность. Элемент должен быть `Iterable`, иначе при чтении будет `TypeError`.
+
+```ts
+[...intoIter([
+  [1, 2],
+  [3, 4],
+]).flatten()]; // [1, 2, 3, 4]
+
+[...intoIter([[1], [], [2, 3]]).flatten()]; // [1, 2, 3]
+```
+
+Глубже одного уровня `flatten` не заглядывает. Следующий уровень снимает ещё один вызов:
+
+```ts
+[...intoIter([[[1, 2]], [[3]]]).flatten()]; // [[1, 2], [3]]
+[...intoIter([[[1, 2]], [[3]]]).flatten().flatten()]; // [1, 2, 3]
+```
+
+Строка, `Set` и `Map` тоже последовательности: `"ab"` развернётся в `"a"`, `"b"`. `flatten` подключается тем же импортом, что и `flatMap`: `into-iter/flat-map`.
+
 ### `reversed`
 
 Геттер, который возвращает ту же цепочку, читаемую с конца. Исходная цепочка не меняется, а двойной `reversed` возвращает исходный порядок.
@@ -118,9 +175,28 @@ const iter = intoIter(new Set([1, 2, 3])).reversed; // ошибки нет
 [...intoIter(10).reversed.limit(3)]; // [9, 8, 7] — последние 3
 ```
 
-`reversed.limit(n)` работает с любой цепочкой, которая читается с конца. Для `limit(n).reversed` нужно ещё знать длину, чтобы найти `n`-й элемент. Длину знают массивы, строки, typed array и диапазоны, а `map`, `limit` и `reversed` её сохраняют. После `filter` длина неизвестна, поэтому такая цепочка выбрасывает `Cannot walk backwards`:
+`reversed.limit(n)` работает с любой цепочкой, которая читается с конца. Для `limit(n).reversed` нужно ещё знать длину, чтобы найти `n`-й элемент. Длину знают массивы, строки, typed array и диапазоны, а `map`, `limit`, `skip` и `reversed` её сохраняют. После `filter`, `flatMap` и `flatten` длина неизвестна, поэтому такая цепочка выбрасывает `Cannot walk backwards`:
 
 ```ts
 [...intoIter(20).filter((n) => n % 7 === 0).reversed.limit(2)]; // [14, 7]
 [...intoIter(20).filter((n) => n % 7 === 0).limit(2).reversed]; // Error: Cannot walk backwards
+[...intoIter([[1], [2, 3, 4]]).flatten().limit(2).reversed]; // Error: Cannot walk backwards
+```
+
+`skip` вместе с `reversed` тоже зависит от порядка. `skip(n).reversed` читает хвост с конца, `reversed.skip(n)` выбрасывает последние `n` элементов:
+
+```ts
+[...intoIter(10).skip(3).reversed]; // [9, 8, 7, 6, 5, 4, 3]
+[...intoIter(10).reversed.skip(3)]; // [6, 5, 4, 3, 2, 1, 0]
+```
+
+`flatMap(...).reversed` и `flatten().reversed` читают внешние последовательности с конца, а каждую внутреннюю тоже с конца. Внутренняя последовательность должна уметь так читаться. `Set` и `Map` внутри выбрасывают `Cannot walk backwards`:
+
+```ts
+[...intoIter([
+  [1, 2],
+  [3, 4],
+]).flatten().reversed]; // [4, 3, 2, 1]
+
+[...intoIter([1, 2]).flatMap((n) => new Set([n])).reversed]; // Error: Cannot walk backwards
 ```

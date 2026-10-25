@@ -16,7 +16,9 @@
   "sideEffects": [
     "./dist/map.js",
     "./dist/filter.js",
-    "./dist/limit.js"
+    "./dist/limit.js",
+    "./dist/skip.js",
+    "./dist/flat-map.js"
   ],
   "files": [
     "dist"
@@ -41,6 +43,16 @@
       "types": "./dist/limit.d.ts",
       "import": "./dist/limit.js",
       "default": "./dist/limit.js"
+    },
+    "./skip": {
+      "types": "./dist/skip.d.ts",
+      "import": "./dist/skip.js",
+      "default": "./dist/skip.js"
+    },
+    "./flat-map": {
+      "types": "./dist/flat-map.d.ts",
+      "import": "./dist/flat-map.js",
+      "default": "./dist/flat-map.js"
     }
   },
   "engines": {
