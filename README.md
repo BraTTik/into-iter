@@ -29,6 +29,9 @@ import "into-iter/fold";
 import "into-iter/every";
 import "into-iter/find";
 import "into-iter/nth";
+import "into-iter/take-while";
+import "into-iter/skip-while";
+import "into-iter/map-while";
 
 const values = intoIter([1, 2, 3, 4])
   .map((n) => n * 2)
@@ -118,6 +121,45 @@ console.log([...values]); // [6, 8]
 `count` должен быть неотрицательным целым числом, иначе `skip` выбрасывает `TypeError`. Ноль элементов пропускать можно.
 
 Несколько `skip` подряд складываются: `skip(2).skip(3)` пропускает пять элементов.
+
+### `takeWhile(predicate)`
+
+Отдаёт элементы, пока `predicate` истинен. Первый неподходящий элемент читается и в результат не входит, дальше источник не читается. Подключается импортом `into-iter/take-while`.
+
+```ts
+[...intoIter([1, 2, 5, 3]).takeWhile((n) => n < 4)]; // [1, 2]
+[...intoIter([1, 2, 5, 3]).reversed.takeWhile((n) => n < 4)]; // [3]
+```
+
+Длины у результата нет, и с конца он не читается. `takeWhile(...).reversed` выбрасывает `Cannot walk backwards`.
+
+### `skipWhile(predicate)`
+
+Отбрасывает элементы, пока `predicate` истинен. С первого неподходящего элемента отдаёт весь хвост, включая его самого. Предикат для хвоста больше не вызывается. Подключается импортом `into-iter/skip-while`.
+
+```ts
+[...intoIter([1, 2, 5, 3]).skipWhile((n) => n < 4)]; // [5, 3]
+[...intoIter([1, 5, 2]).skipWhile((n) => n < 4)]; // [5, 2]
+[...intoIter([1, 2, 5, 3]).reversed.skipWhile((n) => n < 4)]; // [5, 2, 1]
+```
+
+`skipWhile(...).reversed` выбрасывает `Cannot walk backwards`.
+
+### `mapWhile(fn)`
+
+Вызывает `fn` один раз на элемент и отдаёт её значение. `null` и `undefined` означают конец: этот элемент уже прочитан и в результат не входит, дальше источник не читается. `0`, `false` и `""` остаются. Подключается импортом `into-iter/map-while`.
+
+```ts
+[...intoIter(["1", "2", "x", "4"]).mapWhile((s) => {
+  const n = Number(s);
+  return Number.isNaN(n) ? undefined : n;
+})]; // [1, 2]
+
+[...intoIter([1, 0, 2]).mapWhile((n) => (n === 2 ? undefined : n))]; // [1, 0]
+[...intoIter([1, 2, 0, 4]).reversed.mapWhile((n) => (n === 0 ? undefined : n))]; // [4]
+```
+
+`mapWhile(...).reversed` выбрасывает `Cannot walk backwards`.
 
 ### `flatMap(fn)`
 

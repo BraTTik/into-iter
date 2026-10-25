@@ -26,7 +26,10 @@
     "./dist/fold.js",
     "./dist/every.js",
     "./dist/find.js",
-    "./dist/nth.js"
+    "./dist/nth.js",
+    "./dist/take-while.js",
+    "./dist/skip-while.js",
+    "./dist/map-while.js"
   ],
   "files": [
     "dist"
@@ -101,6 +104,21 @@
       "types": "./dist/nth.d.ts",
       "import": "./dist/nth.js",
       "default": "./dist/nth.js"
+    },
+    "./take-while": {
+      "types": "./dist/take-while.d.ts",
+      "import": "./dist/take-while.js",
+      "default": "./dist/take-while.js"
+    },
+    "./skip-while": {
+      "types": "./dist/skip-while.d.ts",
+      "import": "./dist/skip-while.js",
+      "default": "./dist/skip-while.js"
+    },
+    "./map-while": {
+      "types": "./dist/map-while.d.ts",
+      "import": "./dist/map-while.js",
+      "default": "./dist/map-while.js"
     }
   },
   "engines": {
