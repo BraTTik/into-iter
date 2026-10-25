@@ -3,6 +3,8 @@ import "../src/filter.js";
 import "../src/map.js";
 import "../src/limit.js";
 import "../src/flat-map.js";
+import "../src/collect.js";
+import "../src/enumerate.js";
 
 function add2(num: number): number {
   return num + 2;
@@ -19,8 +21,7 @@ const flat = intoIter([1, 2, 3, 4]).filterMap((val) => (val % 2 === 0 ? (val * 2
 
 console.log(...flat);
 
-console.log([...flatMapIter]);
-console.log([...flatMapIter.reversed]);
+console.log(flatMapIter.enumerate().toMap());
 
 const stringIter = intoIter("abc").reversed.reversed.reversed;
 
@@ -28,12 +29,3 @@ const arr = [1, 2, 3];
 
 const arrIter = arr[Symbol.iterator]();
 const nextArrIter = arr[Symbol.iterator]();
-
-console.log(arrIter.next());
-console.log(nextArrIter.next());
-
-console.log(...addIter);
-console.log(...addIter);
-console.log(...nextIter);
-
-console.log(...stringIter);

@@ -19,7 +19,8 @@
     "./dist/filter.js",
     "./dist/limit.js",
     "./dist/skip.js",
-    "./dist/flat-map.js"
+    "./dist/flat-map.js",
+    "./dist/collect.js"
   ],
   "files": [
     "dist"
@@ -59,6 +60,11 @@
       "types": "./dist/flat-map.d.ts",
       "import": "./dist/flat-map.js",
       "default": "./dist/flat-map.js"
+    },
+    "./collect": {
+      "types": "./dist/collect.d.ts",
+      "import": "./dist/collect.js",
+      "default": "./dist/collect.js"
     }
   },
   "engines": {

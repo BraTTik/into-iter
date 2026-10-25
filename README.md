@@ -22,6 +22,7 @@ import "into-iter/filter";
 import "into-iter/limit";
 import "into-iter/skip";
 import "into-iter/flat-map";
+import "into-iter/collect";
 
 const values = intoIter([1, 2, 3, 4])
   .map((n) => n * 2)
@@ -237,4 +238,57 @@ const iter = intoIter(new Set([1, 2, 3])).reversed; // ошибки нет
 ]).flatten().reversed]; // [4, 3, 2, 1]
 
 [...intoIter([1, 2]).flatMap((n) => new Set([n])).reversed]; // Error: Cannot walk backwards
+```
+
+## Сборка результата
+
+`collect`, `toArray`, `toSet` и `toMap` читают цепочку сразу. До их вызова она остаётся ленивой. Подключаются импортом `into-iter/collect`.
+
+### `collect(target)`
+
+Заполняет переданную коллекцию. Для массива, `Set` и `Map` возвращает её же.
+
+```ts
+const numbers = intoIter([1, 2, 3]).map((n) => n * 10);
+
+numbers.collect([]); // [10, 20, 30]
+numbers.collect(new Set()); // Set { 10, 20, 30 }
+intoIter([
+  ["a", 1],
+  ["b", 2],
+] as [string, number][]).collect(new Map()); // Map { "a" => 1, "b" => 2 }
+```
+
+В массив элементы добавляются через `push`, в `Set` через `add`. В `Map` попадают пары `[key, value]`: повторный ключ перезаписывает значение. Уже лежащие в коллекции элементы не стираются.
+
+Свой тип подключается символом `collector`. Его метод возвращает объект с `add` и `finish`. `collect` вызывает `finish` один раз после всех элементов и возвращает его результат:
+
+```ts
+import { collector, type Collector } from "into-iter/collect";
+
+const joined = {
+  [collector](): Collector<number, string> {
+    const items: number[] = [];
+    return {
+      add(value) {
+        items.push(value);
+      },
+      finish() {
+        return items.join(",");
+      },
+    };
+  },
+};
+
+intoIter([1, 2, 3]).collect(joined); // "1,2,3"
+```
+
+### `toArray()`, `toSet()`, `toMap()`
+
+Короткие вызовы `collect` с новой пустой коллекцией. `toMap` доступен, когда элементы — пары `[key, value]`.
+
+```ts
+intoIter([1, 2, 2, 3]).toArray(); // [1, 2, 2, 3]
+intoIter([1, 2, 2, 3]).toSet(); // Set { 1, 2, 3 }
+intoIter([["a", 1], ["b", 2]] as [string, number][]).toMap(); // Map { "a" => 1, "b" => 2 }
 ```
