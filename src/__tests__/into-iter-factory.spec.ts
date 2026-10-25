@@ -1,6 +1,7 @@
 import { describe, it, expect } from "@jest/globals";
 import { intoIter } from "../into-iter-factory.js";
 import { IntoIter } from "../into-iter.js";
+import { AsyncIntoIter } from "../async-into-iter.js";
 
 describe("intoIterFactory", () => {
   describe("constructor", () => {
@@ -27,6 +28,40 @@ describe("intoIterFactory", () => {
       expect(intoIter(Iterator.from({ next: () => ({ done: true, value: undefined }) })) instanceof IntoIter).toBe(
         true,
       );
+    });
+
+    it("creates AsyncIntoIter from an async iterable", () => {
+      async function* values() {
+        yield 1;
+      }
+
+      expect(intoIter(values()) instanceof AsyncIntoIter).toBe(true);
+    });
+
+    it("prefers the async cursor when both symbols exist", () => {
+      const both = {
+        *[Symbol.iterator]() {
+          yield "sync";
+        },
+        async *[Symbol.asyncIterator]() {
+          yield "async";
+        },
+      };
+
+      expect(intoIter(both) instanceof AsyncIntoIter).toBe(true);
+    });
+
+    it("keeps a range synchronous even if it also has an async iterator", () => {
+      const range = {
+        start: 0,
+        end: 2,
+        step: 1,
+        async *[Symbol.asyncIterator]() {
+          yield 9;
+        },
+      };
+
+      expect(intoIter(range) instanceof IntoIter).toBe(true);
     });
   });
 });

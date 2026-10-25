@@ -61,6 +61,23 @@ console.log([...values]); // [6, 8]
 
 Массивы, строки, typed array и диапазоны читаются с обоих концов. Остальные iterable (`Set`, `Map`, генераторы) читаются только вперёд.
 
+Асинхронный iterable (`Symbol.asyncIterator`) даёт `AsyncIntoIter`. Массив, строка, `Set`, `Map` и диапазон остаются `IntoIter`. Если есть оба символа, выбирается асинхронный курсор.
+
+```ts
+const values = intoIter(
+  (async function* () {
+    yield 1;
+    yield 2;
+  })(),
+);
+
+for await (const value of values) {
+  console.log(value);
+}
+```
+
+Обход начинается при чтении. Источник, который каждый раз отдаёт новый `[Symbol.asyncIterator]`, читается заново. Асинхронный генератор после первого прохода пуст.
+
 ## Методы
 
 ### `map(fn)`
