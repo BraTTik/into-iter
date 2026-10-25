@@ -21,7 +21,12 @@
     "./dist/skip.js",
     "./dist/flat-map.js",
     "./dist/collect.js",
-    "./dist/math.js"
+    "./dist/math.js",
+    "./dist/reduce.js",
+    "./dist/fold.js",
+    "./dist/every.js",
+    "./dist/find.js",
+    "./dist/nth.js"
   ],
   "files": [
     "dist"
@@ -71,6 +76,31 @@
       "types": "./dist/math.d.ts",
       "import": "./dist/math.js",
       "default": "./dist/math.js"
+    },
+    "./reduce": {
+      "types": "./dist/reduce.d.ts",
+      "import": "./dist/reduce.js",
+      "default": "./dist/reduce.js"
+    },
+    "./fold": {
+      "types": "./dist/fold.d.ts",
+      "import": "./dist/fold.js",
+      "default": "./dist/fold.js"
+    },
+    "./every": {
+      "types": "./dist/every.d.ts",
+      "import": "./dist/every.js",
+      "default": "./dist/every.js"
+    },
+    "./find": {
+      "types": "./dist/find.d.ts",
+      "import": "./dist/find.js",
+      "default": "./dist/find.js"
+    },
+    "./nth": {
+      "types": "./dist/nth.d.ts",
+      "import": "./dist/nth.js",
+      "default": "./dist/nth.js"
     }
   },
   "engines": {

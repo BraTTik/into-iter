@@ -24,6 +24,11 @@ import "into-iter/skip";
 import "into-iter/flat-map";
 import "into-iter/collect";
 import "into-iter/math";
+import "into-iter/reduce";
+import "into-iter/fold";
+import "into-iter/every";
+import "into-iter/find";
+import "into-iter/nth";
 
 const values = intoIter([1, 2, 3, 4])
   .map((n) => n * 2)
@@ -322,3 +327,98 @@ intoIter([3n, 1n, 2n]).max(); // 3n
 ```
 
 Пустой `bigint`-итератор в рантайме не отличить от пустого числового, поэтому `sum` и `product` на нём возвращают `0` и `1`, а `avg` — `NaN`. `min` и `max` и здесь возвращают `undefined`.
+
+## Свёртка
+
+`reduce`, `fold` и `foldRight` читают цепочку сразу. До их вызова она остаётся ленивой. `reduce` подключается импортом `into-iter/reduce`, `fold` и `foldRight` — импортом `into-iter/fold`.
+
+### `reduce(fn)`
+
+Сворачивает последовательность в значение того же типа. Первый элемент становится аккумулятором, и для него `fn` не вызывается. Пустая последовательность возвращает `undefined`, один элемент возвращается как есть.
+
+```ts
+intoIter([1, 2, 3, 4]).reduce((acc, n) => acc - n); // -8
+intoIter([7]).reduce((acc, n) => acc + n); // 7
+intoIter<number>([]).reduce((acc, n) => acc + n); // undefined
+```
+
+`reversed` меняет, какой элемент считается первым:
+
+```ts
+intoIter([1, 2, 3, 4]).reversed.reduce((acc, n) => acc - n); // -2
+```
+
+### `fold(init, fn)`
+
+Начинает с переданного значения и вызывает `fn` для каждого элемента, включая первый. Пустая последовательность возвращает `init`. Тип аккумулятора может отличаться от типа элементов.
+
+```ts
+intoIter([1, 2, 3]).fold(10, (acc, n) => acc + n); // 16
+intoIter<number>([]).fold(10, (acc, n) => acc + n); // 10
+intoIter([1, 2, 3]).fold("", (acc, n) => acc + n); // "123"
+intoIter([1, 2, 3]).reversed.fold("", (acc, n) => acc + n); // "321"
+```
+
+### `foldRight(init, fn)`
+
+Та же свёртка с конца. Источник должен уметь читаться назад, иначе вызов выбрасывает `Error("Cannot walk backwards")`.
+
+```ts
+intoIter([1, 2, 3]).foldRight("", (acc, n) => acc + n); // "321"
+intoIter([1, 2, 3]).reversed.foldRight("", (acc, n) => acc + n); // "123"
+intoIter(new Set([1, 2, 3])).foldRight(0, (acc, n) => acc + n); // Error: Cannot walk backwards
+```
+
+## Поиск
+
+`every`, `some`, `find`, `findMap`, `position` и `findLast` читают цепочку сразу и останавливаются, как только ответ уже известен. До вызова цепочка остаётся ленивой.
+
+`every` и `some` подключаются импортом `into-iter/every`. `find`, `findMap`, `position` и `findLast` — импортом `into-iter/find`.
+
+### `every(fn)` и `some(fn)`
+
+`every` возвращает `true`, пока предикат истинен для каждого элемента, и останавливается на первом `false`. Пустая последовательность даёт `true`. `some` останавливается на первом `true`. Пустая последовательность даёт `false`.
+
+```ts
+intoIter([1, 2, 3, 4]).every((n) => n < 3); // false
+intoIter([1, 2, 3, 4]).some((n) => n > 2); // true
+intoIter<number>([]).every((n) => n > 0); // true
+intoIter<number>([]).some((n) => n > 0); // false
+```
+
+### `find(fn)`, `findMap(fn)`, `position(fn)`, `findLast(fn)`
+
+`find` возвращает первый подходящий элемент, иначе `undefined`. `0`, `false`, `""` и `null` остаются, если предикат их выбрал.
+
+`findMap` пропускает `null` и `undefined`, которые вернула функция, и сразу отдаёт первое другое значение.
+
+`position` возвращает индекс первого совпадения в текущем направлении, с нуля. После `reversed` счёт идёт с конца, после `filter` — по уже отфильтрованной последовательности.
+
+`findLast` ищет с конца. Если источник умеет читаться назад, чтение останавливается на первом совпадении с конца. `Set` и генератор читаются с начала, и остаётся последнее совпадение.
+
+```ts
+intoIter([1, 2, 3, 4]).find((n) => n > 2); // 3
+intoIter([1, 2, 3]).findMap((n) => (n === 2 ? undefined : n * 10)); // 10
+intoIter([1, 2, 3, 4]).position((n) => n > 2); // 2
+intoIter([1, 2, 3, 4]).reversed.position((n) => n === 2); // 2
+intoIter([1, 2, 3, 4]).findLast((n) => n < 4); // 3
+intoIter(new Set([1, 2, 3, 4])).findLast((n) => n % 2 === 0); // 4
+```
+
+## Доступ по индексу
+
+`first`, `last`, `nth` и `nthBack` подключаются импортом `into-iter/nth`. Индекс должен быть неотрицательным целым числом, иначе методы выбрасывают `TypeError("Nth must be a non-negative integer")`.
+
+`nth(n)` пропускает `n` элементов и возвращает следующий. Дальше источник не читается. `first()` — это `nth(0)`. Если элементов меньше, результат `undefined`.
+
+`nthBack(n)` считает с конца. У массива, строки и диапазона для этого хватает шагов назад. У `Set` и генератора метод один раз проходит последовательность с начала. `last()` — это `nthBack(0)`.
+
+```ts
+intoIter([1, 2, 3, 4, 5]).nth(2); // 3
+intoIter([1, 2, 3, 4, 5]).first(); // 1
+intoIter([1, 2, 3, 4, 5]).nthBack(1); // 4
+intoIter([1, 2, 3, 4, 5]).last(); // 5
+intoIter(new Set([1, 2, 3, 4, 5])).nthBack(1); // 4
+intoIter<number>([]).first(); // undefined
+intoIter([1]).nth(-1); // TypeError: Nth must be a non-negative integer
+```
