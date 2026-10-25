@@ -1,4 +1,4 @@
-export function bound<F extends (...args: never[]) => unknown>(target: object, fn?: F | undefined) {
+export function bound<F extends (...args: never[]) => unknown>(target: object, fn?: F | undefined): F | undefined {
   return fn?.bind(target) as F | undefined;
 }
 

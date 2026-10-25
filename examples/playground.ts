@@ -2,6 +2,7 @@ import { intoIter } from "../src/into-iter-factory.js";
 import "../src/filter.js";
 import "../src/map.js";
 import "../src/limit.js";
+import "../src/flat-map.js";
 
 function add2(num: number): number {
   return num + 2;
@@ -11,6 +12,11 @@ const test = intoIter(10);
 
 const addIter = test.map(add2).map(add2);
 const nextIter = test.map(add2).limit(2).reversed;
+
+const flatMapIter = intoIter([1, 2, 3, 4]).limit(2);
+
+console.log([...flatMapIter]);
+console.log([...flatMapIter.reversed]);
 
 const stringIter = intoIter("abc").reversed.reversed.reversed;
 
