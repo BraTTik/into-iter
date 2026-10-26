@@ -1,6 +1,7 @@
 import { describe, it, expect } from "@jest/globals";
+import "../collect.js";
 import "../map.js";
-import { collector, type Collector } from "../collect.js";
+import { collector, type Collector } from "../collector.js";
 import { intoIter } from "../into-iter-factory.js";
 
 describe("IntoIter collect", () => {

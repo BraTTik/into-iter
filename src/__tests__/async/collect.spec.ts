@@ -1,7 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import { intoIter } from "../../into-iter-factory.js";
-import { collector as publicCollector, type Collector } from "../../collect.js";
-import { collector } from "../../collector.js";
+import { collector, type Collector } from "../../collector.js";
 import "../../async/collect.js";
 import "../../async/map.js";
 
@@ -18,10 +17,6 @@ const replayable = <T>(values: T[]) => ({
 });
 
 describe("AsyncIntoIter collect", () => {
-  it("uses the same collector symbol as the synchronous import", () => {
-    expect(collector).toBe(publicCollector);
-  });
-
   it("fills an array and returns the same instance", async () => {
     const target: number[] = [0];
 
@@ -71,7 +66,7 @@ describe("AsyncIntoIter collect", () => {
     const added: number[] = [];
     let finished = 0;
     const target = {
-      [publicCollector](): Collector<number, string> {
+      [collector](): Collector<number, string> {
         return {
           add(value) {
             added.push(value);
