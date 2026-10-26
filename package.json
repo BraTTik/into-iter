@@ -30,7 +30,28 @@
     "./dist/take-while.js",
     "./dist/skip-while.js",
     "./dist/map-while.js",
-    "./dist/chain.js"
+    "./dist/chain.js",
+    "./dist/count.js",
+    "./dist/all.js",
+    "./dist/async/map.js",
+    "./dist/async/enumerate.js",
+    "./dist/async/filter.js",
+    "./dist/async/limit.js",
+    "./dist/async/skip.js",
+    "./dist/async/flat-map.js",
+    "./dist/async/collect.js",
+    "./dist/async/math.js",
+    "./dist/async/reduce.js",
+    "./dist/async/fold.js",
+    "./dist/async/every.js",
+    "./dist/async/find.js",
+    "./dist/async/nth.js",
+    "./dist/async/take-while.js",
+    "./dist/async/skip-while.js",
+    "./dist/async/map-while.js",
+    "./dist/async/chain.js",
+    "./dist/async/count.js",
+    "./dist/async/all.js"
   ],
   "files": [
     "dist"
@@ -130,6 +151,106 @@
       "types": "./dist/chain.d.ts",
       "import": "./dist/chain.js",
       "default": "./dist/chain.js"
+    },
+    "./all": {
+      "types": "./dist/all.d.ts",
+      "import": "./dist/all.js",
+      "default": "./dist/all.js"
+    },
+    "./async/map": {
+      "types": "./dist/async/map.d.ts",
+      "import": "./dist/async/map.js",
+      "default": "./dist/async/map.js"
+    },
+    "./async/enumerate": {
+      "types": "./dist/async/enumerate.d.ts",
+      "import": "./dist/async/enumerate.js",
+      "default": "./dist/async/enumerate.js"
+    },
+    "./async/filter": {
+      "types": "./dist/async/filter.d.ts",
+      "import": "./dist/async/filter.js",
+      "default": "./dist/async/filter.js"
+    },
+    "./async/limit": {
+      "types": "./dist/async/limit.d.ts",
+      "import": "./dist/async/limit.js",
+      "default": "./dist/async/limit.js"
+    },
+    "./async/skip": {
+      "types": "./dist/async/skip.d.ts",
+      "import": "./dist/async/skip.js",
+      "default": "./dist/async/skip.js"
+    },
+    "./async/flat-map": {
+      "types": "./dist/async/flat-map.d.ts",
+      "import": "./dist/async/flat-map.js",
+      "default": "./dist/async/flat-map.js"
+    },
+    "./async/collect": {
+      "types": "./dist/async/collect.d.ts",
+      "import": "./dist/async/collect.js",
+      "default": "./dist/async/collect.js"
+    },
+    "./async/math": {
+      "types": "./dist/async/math.d.ts",
+      "import": "./dist/async/math.js",
+      "default": "./dist/async/math.js"
+    },
+    "./async/reduce": {
+      "types": "./dist/async/reduce.d.ts",
+      "import": "./dist/async/reduce.js",
+      "default": "./dist/async/reduce.js"
+    },
+    "./async/fold": {
+      "types": "./dist/async/fold.d.ts",
+      "import": "./dist/async/fold.js",
+      "default": "./dist/async/fold.js"
+    },
+    "./async/every": {
+      "types": "./dist/async/every.d.ts",
+      "import": "./dist/async/every.js",
+      "default": "./dist/async/every.js"
+    },
+    "./async/find": {
+      "types": "./dist/async/find.d.ts",
+      "import": "./dist/async/find.js",
+      "default": "./dist/async/find.js"
+    },
+    "./async/nth": {
+      "types": "./dist/async/nth.d.ts",
+      "import": "./dist/async/nth.js",
+      "default": "./dist/async/nth.js"
+    },
+    "./async/take-while": {
+      "types": "./dist/async/take-while.d.ts",
+      "import": "./dist/async/take-while.js",
+      "default": "./dist/async/take-while.js"
+    },
+    "./async/skip-while": {
+      "types": "./dist/async/skip-while.d.ts",
+      "import": "./dist/async/skip-while.js",
+      "default": "./dist/async/skip-while.js"
+    },
+    "./async/map-while": {
+      "types": "./dist/async/map-while.d.ts",
+      "import": "./dist/async/map-while.js",
+      "default": "./dist/async/map-while.js"
+    },
+    "./async/chain": {
+      "types": "./dist/async/chain.d.ts",
+      "import": "./dist/async/chain.js",
+      "default": "./dist/async/chain.js"
+    },
+    "./async/count": {
+      "types": "./dist/async/count.d.ts",
+      "import": "./dist/async/count.js",
+      "default": "./dist/async/count.js"
+    },
+    "./async/all": {
+      "types": "./dist/async/all.d.ts",
+      "import": "./dist/async/all.js",
+      "default": "./dist/async/all.js"
     }
   },
   "engines": {

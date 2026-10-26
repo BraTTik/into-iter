@@ -42,7 +42,7 @@ console.log([...values]); // [6, 8]
 console.log([...values]); // [6, 8]
 ```
 
-`reversed` есть всегда, отдельный импорт ему не нужен.
+`reversed` есть всегда, отдельный импорт ему не нужен. Все синхронные методы сразу подключает `import "into-iter/all"`.
 
 ## Источники
 
@@ -77,6 +77,47 @@ for await (const value of values) {
 ```
 
 Обход начинается при чтении. Источник, который каждый раз отдаёт новый `[Symbol.asyncIterator]`, читается заново. Асинхронный генератор после первого прохода пуст.
+
+Асинхронные методы подключаются отдельно. Импорт `into-iter/map` их не добавляет. Все сразу подключает `import "into-iter/async/all"`:
+
+```ts
+import { intoIter } from "into-iter";
+import "into-iter/async/map";
+import "into-iter/async/enumerate";
+import "into-iter/async/filter";
+import "into-iter/async/limit";
+import "into-iter/async/skip";
+import "into-iter/async/flat-map";
+import "into-iter/async/collect";
+import "into-iter/async/math";
+import "into-iter/async/reduce";
+import "into-iter/async/fold";
+import "into-iter/async/every";
+import "into-iter/async/find";
+import "into-iter/async/nth";
+import "into-iter/async/take-while";
+import "into-iter/async/skip-while";
+import "into-iter/async/map-while";
+import "into-iter/async/chain";
+import "into-iter/async/count";
+
+const values = intoIter(
+  (async function* () {
+    yield 1;
+    yield 2;
+    yield 3;
+    yield 4;
+  })(),
+)
+  .map(async (n) => n * 10)
+  .filter((n) => n > 20);
+
+console.log(await values.toArray()); // [30, 40]
+```
+
+Контракт совпадает с синхронными методами. Адаптер возвращает `AsyncIntoIter`, терминальный метод возвращает `Promise`. Колбэки могут вернуть `Promise`. `flatMap` и `chain` принимают обычную или асинхронную последовательность; если есть оба символа, берётся асинхронный итератор.
+
+`reversed`, `foldRight` и `nthBack` нет. `last` и `findLast` читают источник с начала. `remaining` сохраняют `map`, `enumerate`, `limit`, `skip` и `chain`, когда длина известна. `count` в этом случае возвращает её без чтения элементов. Символ своего коллектора по-прежнему импортируется из `into-iter/collector`.
 
 ## Методы
 
