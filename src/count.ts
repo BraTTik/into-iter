@@ -1,6 +1,7 @@
 import { IntoIter } from "./into-iter.js";
 
 declare module "./into-iter.js" {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface IntoIter<T> {
     count(): number;
   }
