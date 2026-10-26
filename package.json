@@ -76,6 +76,11 @@
       "import": "./dist/collect.js",
       "default": "./dist/collect.js"
     },
+    "./collector": {
+      "types": "./dist/collector.d.ts",
+      "import": "./dist/collector.js",
+      "default": "./dist/collector.js"
+    },
     "./math": {
       "types": "./dist/math.d.ts",
       "import": "./dist/math.js",

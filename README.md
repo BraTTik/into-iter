@@ -343,12 +343,13 @@ intoIter([
 
 В массив элементы добавляются через `push`, в `Set` через `add`. В `Map` попадают пары `[key, value]`: повторный ключ перезаписывает значение. Уже лежащие в коллекции элементы не стираются.
 
-Свой тип подключается символом `collector`. Его метод возвращает объект с `add` и `finish`. `collect` вызывает `finish` один раз после всех элементов и возвращает его результат:
+Свой тип подключается символом `collector`. Символ и типы `Collector` и `Collectable` импортируются из `into-iter/collector`: этот модуль ничего не добавляет на `IntoIter`. Метод `[collector]` возвращает объект с `add` и `finish`. `collect` вызывает `finish` один раз после всех элементов и возвращает его результат:
 
 ```ts
-import { collector, type Collector } from "into-iter/collect";
+import "into-iter/collect";
+import { collector, type Collectable, type Collector } from "into-iter/collector";
 
-const joined = {
+const joined: Collectable<number, string> = {
   [collector](): Collector<number, string> {
     const items: number[] = [];
     return {

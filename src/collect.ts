@@ -1,15 +1,6 @@
 import { IntoIter } from "./into-iter.js";
-
-export const collector = Symbol("collector.into-iter");
-
-export interface Collector<T, R> {
-  add(value: T): void;
-  finish(): R;
-}
-
-export interface Collectable<T, R> {
-  [collector](): Collector<T, R>;
-}
+import { arrayCollectable, mapCollectable, setCollectable } from "./collect-sinks.js";
+import { collector, type Collectable, type Collector } from "./collector.js";
 
 declare module "./into-iter.js" {
   interface IntoIter<T> {
@@ -23,22 +14,6 @@ declare module "./into-iter.js" {
     toSet(): Set<T>;
   }
 }
-
-const arrayCollectable = <T>(arr: T[]): Collector<T, T[]> => ({
-  add: (value) => {
-    arr.push(value);
-  },
-  finish: () => arr,
-});
-const mapCollectable = <K, V>(map: Map<K, V>): Collector<[K, V], Map<K, V>> => ({
-  add: ([key, value]) => map.set(key, value),
-  finish: () => map,
-});
-
-const setCollectable = <T>(set: Set<T>): Collector<T, Set<T>> => ({
-  add: (value) => set.add(value),
-  finish: () => set,
-});
 
 function collect<T>(this: IntoIter<T>, collector: Array<T>): Array<T>;
 function collect<K, V>(this: IntoIter<[K, V]>, collector: Map<K, V>): Map<K, V>;
